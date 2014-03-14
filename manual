@@ -1,0 +1,131 @@
+Here's a description of the fourth programming assignment for CSE 100, Summer 2013. In this assignment you will gain experience in implementing graph and disjoint set data structures, and Kruskal's and Dijkstra's algorithms on graphs and the union-find algorithm on disjoint sets. The resulting application you will write would be useful as a network infrastructure planning tool.
+
+>>> Due Sunday, Septemeber 8th 23:59 PM
+
+Submissions before Friday, Septemeber 6th 23:59 will be awarded +3 bonus points (up to a maximum of 7).
+
+>>> Required solution files: Makefile, README, plus any *.hpp and *.cpp files in your working directory.
+
+The files that contain your solution to the assignment must be turned using the bundleP4 script by the due deadline.
+
+If you are working in a team of 2 students, turn in your assignment from one of your two accounts only. In your source code files, clearly document the names and login names of the authors. 
+
+In doing this assignment, it's your responsibility to understand the course rules for integrity of scholarship.
+
+Getting started
+
+Read Weiss, Chapter 8 and 9. Make sure you understand graphs in general, how to use the union and find operations on disjoint sets to implement Kruskal's algorithm on graphs, and how Dijkstra's algorithm works and what it is useful for.
+Create a directory named P4 under the home directory for your class account on ieng6. Your files should be bundled from that directory using the bundleP4 script before the due time for the assignment.
+
+Network Planning Problem
+
+Building high-speed long distance computer networks is very costly. Small improvements in the design stage can save huge amounts of resources that would be otherwise wasted. Specialists can estimate the costs to directly connect computers in any two locations, but it is still a difficult problem to decide which network of connections to actually build in order to permit a fast connection between any pair of computers while obtaining the minimum possible overall construction cost. In this assignment, you will develop a tool that could help with the network planning process.
+
+You will write a program netplan that will be invoked with a command line of the form
+
+netplan infile
+The file specified by the infile command-line argument will contain lines of data, as in this example:
+ ibm.com    yahoo.com     20   33
+ yahoo.com  ucsd.edu      19   40
+ ucsd.edu   ibm.com       10   17
+ yahoo.com  fsf.org        5   10
+Each line contains four items: two words followed by two integers, all separated by whitespace. (No computer name contains whitespace.) The words are computer names; the first integer is the cost of laying a fiber link directly connecting the two machines, in millions of dollars; the second integer is the time it would take to send a packet between the two machines over that link, in miliseconds. This file shows all the links that are in fact possible to build (any others would have effectively infinite cost).
+Your program should read that file, and then print out the following analysis (to standard output), one integer number per line:
+
+The total cost of building all of the possible network links.
+The total cost of building the cheapest network that will permit packets to travel from any computer to any other.
+The amount of money saved in building that minimum-cost network instead of the all-possible-links network.
+The total transit time to send a packet between all pairs of computers if all possible network links were built.
+The total transit time it would take to send a packet between all pairs of computers in the minimum-cost network.
+The increase in the "total time" required for packet travel in the cheap network (compared to having built all possible links).
+For example, with the above input file, your program would output
+54
+34
+20
+386
+482
+96
+This indicates that the cheap network saves 20 million dollars, but in sending a packet between all pairs of machines, a total of 96 more milliseconds (a 25% increase) is required. So, there is a tradeoff in minimizing the cost of network links: the overall network latency may increase.
+Note: Your output will be tested automatically by a script, so make sure you do not output anything but those numbers, each on its own line.
+
+Solution suggestions
+
+Decompose the problem! An object-oriented decomposition suggests that you should define Graph, Vertex, and Edge classes. Think about what properties and behavior an instance of each class should have, and write a corresponding .hpp header file that declares the class's member variables and member functions. If the definition of member functions is extensive (as it will be for the Graph class), you should write a separate .cpp implementation file containing the definitions.
+Your executable program will then use an instance of your Graph class to do its work. A procedural decomposition of the program might have these parts:
+
+Create a graph, initially empty. You will no doubt need some supporting datastructures as well. You should be able to handle at least 1000 computers, and up to 100,000 links in the input file.
+Open the input file for reading. You can assume that the input file is in the format described above.
+Read lines from the input file and add appropriate vertices and edges in the associated graph G. Note that because network links are bidirectional, the input graph is undirected: if there is a link from machine A to machine B, that means there is necessarily also a link from B to A (with the same cost and transit time).
+Close the input file.
+Output the total cost of edges in G.
+Find a minimum cost spanning tree of G, say M. Output the total cost of edges in M, and the difference between the total cost of edges in G and in M. (Note that the difference will never be negative.)
+Apply Dijkstra's algorithm repeatedly in both M and G to find the minimum time path between each pair of vertices. (Alternatively, you could use the Floyd-Warshall algorithm once to find all pairwise minimum time paths; this might be faster in practice on dense graphs.) Output the total time for all such pairs for G, for M, and the difference between them. (Note that the difference will never be negative.)
+Documentation
+
+Document your code. For this assignment, you will not turn in a separate user's manual; comments within the source code files themselves will suffice, if they are clear, informative, compelete, and appropriately written.
+
+Describe how to use your program, what its purpose is, and what its limitations are. Be sure to indicate who wrote the code; both students' names and login names must appear prominently in all source code files, if the assignment was done as a team.
+
+Notes and hints
+
+The file refnetplan in the directory ~/../public/P4/ is a "reference" implementation that satisfies the functional requirement of this assignment. You can use it to verify your results.
+
+You should test your program as thoroughly as you can (we will certainly test it as thoroughly as we can when grading it). The file public/P4/usa.net may be useful as one very simple test case.
+
+Grading
+
+There are 25 possible points on the assignment. If your solution files do not compile and link error-free, you will receive 0 points for this assignment. We will compile the files you turn in with the command: make netplan.
+To get credit for your program, it should compile, and it should spend less than 10 seconds (on ieng6) on any 1000-edge graph with a unique minimum-cost spanning tree. To get full credit, style and comments count.
+
+Point breakdown:
+
+21 points for a NetPlan program that correctly uses the union-find Kruskal's (or Prim's) algorithm and the Dijkstra (or Floyd-Warshall) algorithm to solve the problem as specified.
+4 points for a good object-oriented design, good coding style, and informative, well-written comments.
++1/+3/+3 Extra credit for design, implementing betweeness centrality and using it to find a preferred minimal network for the netplan.
+Extra Credit:
+
+The following are three ways to earn extra credit (E.C.) points on this assignment you may extend your solution of the netplan problem in the following ways:
+
++0.5/+1 A high quality design document detailing the design and API of you solution to the netplan problem.
+
+To get these points you will need to compose an aesthetic and succinct document describing the requirements and API of your netplan implementation. 
+
+All public methods and accessible data structures need to be explained. The length of the document will serve no indication of its quality, a shorter but complete document is superior to a lengthy meandering document that is hard to navigate. The goal is to make your code as easily navigable for a first time reader, with the minimum required reading. Consider including a figures which to describe the dependencies and interaction between the different classes.
+
++3 implementing a measure of betweeness centrality on the nodes of input graph.
+
+Betweeness centrality is a measure of node ‘importance’ in a graph. Nodes in key location with many paths going from them to the rest of the graph will score highly on the betweeness centrality scale. To get this E.C. you will need to extend your previous design in order to calculate the betweeness centrality on the nodes in the input graph.
+
+Your code compiled with: 
+$ make netplanBC
+
+should create a second binary which when run with the command:
+
+$ netplanBC inputgraph
+
+will output the name of the three (3) nodes with the highest betweeness centrality score in the input network along with their respective scores (each node on a single line with a tab delimiter separating the name from the score), in sorted order from highest to 3rd highest score.
+
+E.g. (Note: the numbers below are for illustration only):
+
+ibm.com	3.45
+ucsd.edu	2.39	
+yahoo.com	2.2
+To earn full credit describe briefly in a README file how you decided to solve this problem. Clearly cite any literature or website you used for reference.
+
++3 finding the MST which maximizes the degree.
+
+As you know a graph could have multiple MSTs. To earn this bonus you will need to extend your code to identify the MSTs on an input graph such that this tree has the highest degree sum over the three nodes identified above as having the highest centrality measure. 
+
+This approach will allow you to include in your network plan the most important hubs in the input network.
+
+
+Your code compiled with: 
+$ make netplanMST
+
+should create a third binary which when run with the command:
+
+$ netplanMST inputgraph
+
+will output the same output as the original netplan implementation, only using the MST selected based on the betweeness centrality criteria.
+
+To earn full credit describe briefly in a README file how you decided to solve this problem. Cleary cite any literature or website you used for reference. 
